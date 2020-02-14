@@ -9,7 +9,7 @@ const LoginPresenter =({onLogin})=>(
         <input placeholder="Username" type="text" />
         <input placeholder="Password" type="password" />
         <button onClick={onLogin} type="button">Login</button>
-        <a href="/auth/google">Sign In with Google</a>
+        <a href="/auth/google"><button>Sign In with Google</button></a>
     </div>
 )
 
