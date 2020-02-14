@@ -3,33 +3,33 @@ import axios from 'axios'
 
 const initialState :any= {
 	isLoad: null,
-	data : {
-		isLogged: false,
-		accessToken : null
+	auth : {
+		access_token : null,
+		refresh_token : null,
 	},
 	error: null,
 }
 
 const loadingState :any= {
 	isLoad: true,
-	data : {
-		isLogged: false,
-		accessToken : null
+	auth : {
+		access_token : null,
+		refresh_token : null,
 	},
 	error: null,
 }
 
-const success  =  data=> ({
+const success  =  auth=> ({
     isLoad: false,
-    data,
+	auth : auth,
     error: null,
 });
 
 const error = error => ({
     isLoad: false,
-    data: {
-		isLogged: false,
-		accessToken : null
+	auth : {
+		access_token : null,
+		refresh_token : null,
 	},
     error: error,
 });
@@ -57,10 +57,10 @@ export const UserReducer = ( state:any, action:any)=>{
 		case UserAction.REQUEST_AUTH :
 			return loadingState;
 		case UserAction.REQUEST_AUTH_SUCCESS:
-			action.data = {
-				isLogged : true,
-				accessToken :123131
-			}
+			// action.data = {
+			// 	isLogged : true,
+			// 	accessToken :123131
+			// }
 			return success(action.data);
 		case UserAction.REQUEST_AUTH_ERROR:
 			return error(action.data);
@@ -75,7 +75,6 @@ export const requestAuth = async (dispatch:any)=>{
 	})
 
 	try {
-		// const { data } = await axios.get('/api/events');
 		dispatch({
 			type : UserAction.REQUEST_AUTH_SUCCESS,
 		})
