@@ -3,6 +3,7 @@ import passport from 'passport';
 import { OAuth2Strategy as GoogleStrategy} from 'passport-google-oauth';
 import { User } from './entity/User';
 import { Auth } from './entity/Auth'
+// import { signToken } from './authService';
 
 dotenv.config();
 // Use the GoogleStrategy within Passport.
@@ -14,17 +15,12 @@ passport.use(
 		{
 			clientID: process.env.GOOGLE_CLIENT_ID,
 			clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-			callbackURL: "http://localhost:3000/auth/google/callback"
+			callbackURL: "http://localhost:8080/auth/google/callback"
 		},
 		async (accessToken, refreshToken, profile, done) => {
 
 			// return done();
 			let {given_name:firstName, family_name:lastName, picture} = profile._json;
-			console.log({
-				firstName,
-				lastName,
-				picture
-			}, profile._json, accessToken, refreshToken, done);
 
 			let createdUser = await User.create({
 				googleId:profile.id ,
@@ -33,16 +29,16 @@ passport.use(
 				picture
 			}).save();
 
-
-			let session = await Auth.create({
-				userId : createdUser.id,
-				accessToken,
-				refreshToken,
-			}).save();
-
-			console.log(createdUser, session)
-
-			return done()
+			// check if user already exists
+			const currentUser = await User.findOne({ googleId: profile.id });
+			if (currentUser) {
+				// already have the user -> return (login)
+				return done(null, currentUser);
+			} else {
+				// register user and return
+				const newUser = await User.create({ firstName, lastName, picture, googleId: profile.id }).save();
+				return done(null, newUser);
+			}
 		}
 	)
 );

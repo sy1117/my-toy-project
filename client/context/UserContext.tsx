@@ -1,40 +1,14 @@
-import React, { createContext, useReducer } from 'react'
+import React, { createContext, useReducer, useState } from 'react'
 import axios from 'axios'
 
-const initialState :any= {
-	isLoad: null,
-	auth : {
-		access_token : null,
-		refresh_token : null,
-	},
-	error: null,
+
+const initialState = {
+	isLogged : false,
+	jwt : localStorage.getItem("jwt")
 }
 
-const loadingState :any= {
-	isLoad: true,
-	auth : {
-		access_token : null,
-		refresh_token : null,
-	},
-	error: null,
-}
 
-const success  =  auth=> ({
-    isLoad: false,
-	auth : auth,
-    error: null,
-});
-
-const error = error => ({
-    isLoad: false,
-	auth : {
-		access_token : null,
-		refresh_token : null,
-	},
-    error: error,
-});
-
-export const UserContext = createContext(initialState);
+export const UserContext = createContext(null);
 
 export const UserProvider = ({children}:{children:any})=>{
 	const [user, dispatch] = useReducer(UserReducer, initialState);
@@ -49,36 +23,61 @@ export const UserProvider = ({children}:{children:any})=>{
 const UserAction = {
 	REQUEST_AUTH :"REQUEST_AUTH",
 	REQUEST_AUTH_SUCCESS : "REQUEST_AUTH_SUCCESS",
-	REQUEST_AUTH_ERROR : "REQUEST_AUTH_ERROR"
+	REQUEST_AUTH_ERROR : "REQUEST_AUTH_ERROR",
+	LOGOUT : "LOGOUT",
 }
 
 export const UserReducer = ( state:any, action:any)=>{
 	switch(action.type){
 		case UserAction.REQUEST_AUTH :
-			return loadingState;
+			return {
+				...state,
+				isLoad:null,
+			};
 		case UserAction.REQUEST_AUTH_SUCCESS:
-			// action.data = {
-			// 	isLogged : true,
-			// 	accessToken :123131
-			// }
-			return success(action.data);
+			return {
+				...state,
+				isLogged: true,
+				isLoad:true,
+			};
 		case UserAction.REQUEST_AUTH_ERROR:
-			return error(action.data);
+			return {
+				...state,
+				isLogged: false,
+				isLoad:true,
+			};
+		case UserAction.LOGOUT :
+			return {
+				...state,
+				isLogged:false,
+				jwt : null,
+			}
 		default :
 			break;
 	}
 }
 
+export const logout  = (dispatch)=>{
+	dispatch({
+		type: UserAction.LOGOUT
+	})
+}
+
 export const requestAuth = async (dispatch:any)=>{
+
 	dispatch({
 		type: UserAction.REQUEST_AUTH
 	})
-
 	try {
+		let res = await axios.get (`/auth/verify`,{
+			headers: {'authorization': `bearer ${localStorage.jwt}`}
+		});
 		dispatch({
 			type : UserAction.REQUEST_AUTH_SUCCESS,
 		})
 	} catch (error) {
-		
+		dispatch({
+			type : UserAction.REQUEST_AUTH_ERROR,
+		})
 	}
 }

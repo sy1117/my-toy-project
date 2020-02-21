@@ -7,8 +7,8 @@ export class User extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({type:"int"})
-    googleId : number;
+    @Column({type:"text", nullable:true})
+    googleId : string;
 
     @Column({type:"text"})
     firstName: string;

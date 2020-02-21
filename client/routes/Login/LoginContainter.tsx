@@ -6,6 +6,7 @@ const LoginContainer : React.SFC = ()=> {
 
     const {user, dispatch} = useContext(UserContext);
     const onLogin = async (e)=>{
+        e.preventDefault();
         await requestAuth(dispatch);
     }
     

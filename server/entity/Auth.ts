@@ -7,6 +7,9 @@ export class Auth extends BaseEntity{
     @PrimaryGeneratedColumn()
     id: number;
 
+    @Column({type:"text", nullable:true})
+    googleId : string;
+
     @Column({nullable:true})
     userId : number
 
