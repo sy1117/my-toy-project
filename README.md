@@ -1,4 +1,4 @@
-# my-toy-project
+# oauth-sample
 
 
 ## Available Scripts
